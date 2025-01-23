@@ -16,6 +16,7 @@ var (
 	focusedModelStyle = lipgloss.NewStyle().
 				Width(15).
 				Height(5).
+				Bold(true).
 				Align(lipgloss.Center, lipgloss.Center).
 				BorderStyle(lipgloss.NormalBorder()).
 				BorderForeground(lipgloss.Color("69"))
@@ -28,7 +29,7 @@ var (
 	headerStyle = lipgloss.NewStyle().
 			Width(15).
 			Height(1).
+			Bold(true).
 			BorderStyle(lipgloss.NormalBorder()).
-			Align(lipgloss.Center, lipgloss.Center).
-			Bold(true)
+			Align(lipgloss.Center, lipgloss.Center)
 )
