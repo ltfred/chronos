@@ -3,6 +3,7 @@ package models
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/ltfred/chronos/utils"
 	"time"
 )
 
@@ -125,22 +126,26 @@ func (m DayModel) View() string {
 	for i := 0; i < rowCount; i++ {
 		rows = append(rows, m.choices[i*7:(i+1)*7])
 	}
+	onlyDayFormat := func(t time.Time) string {
+		return t.Format("02")
+	}
 	joinHorizontal := func(choices []dayChoice) string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
+			calendar := utils.GetLunarCalendar(v.time)
 			if v.pos == m.cursor {
+				s := focusedModelStyle.Render(onlyDayFormat(v.time), "休", calendar)
 				if v.isInvalid {
-					ss = append(ss, focusedModelInvalidStyle.Render(v.time.Format("2006-01-02")))
-				} else {
-					ss = append(ss, focusedModelStyle.Render(v.time.Format("2006-01-02")))
+					s = focusedModelInvalidStyle.Render(onlyDayFormat(v.time), "\n", calendar)
 				}
+				ss = append(ss, s)
 				continue
 			}
 			if v.isInvalid {
-				ss = append(ss, modelStyle.Render(grayTextStyle.Render(v.time.Format("2006-01-02"))))
+				ss = append(ss, modelStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), "\n", calendar))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(v.time.Format("2006-01-02")))
+			ss = append(ss, modelStyle.Render(onlyDayFormat(v.time), "\n", calendar))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}

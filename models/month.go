@@ -83,10 +83,10 @@ func (m MonthModel) View() string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
 			if v.pos == m.cursor {
-				ss = append(ss, focusedModelStyle.Render(v.time.Format("2006-01")))
+				ss = append(ss, monthFocusedModelStyle.Render(v.time.Format("2006-01")))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(v.time.Format("2006-01")))
+			ss = append(ss, monthModelStyle.Render(v.time.Format("2006-01")))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
