@@ -4,10 +4,10 @@ import "github.com/charmbracelet/lipgloss"
 
 // day
 var (
-	grayTextStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: "#808080",
-		Dark:  "#808080",
-	})
+	grayTextStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#808080", Dark: "#808080"})
+	redTextStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#FF0000", Dark: "#FF0000"}).Bold(true)
+	boldTextStyle = lipgloss.NewStyle().Bold(true)
+
 	modelStyle = lipgloss.NewStyle().
 			Width(9).
 			Height(2).
@@ -16,16 +16,15 @@ var (
 	focusedModelStyle = lipgloss.NewStyle().
 				Width(9).
 				Height(2).
-				Bold(true).
 				Align(lipgloss.Center, lipgloss.Center).
-				BorderStyle(lipgloss.HiddenBorder()).
-				Background(lipgloss.Color("#DE684F"))
+				BorderStyle(lipgloss.NormalBorder()).
+				BorderForeground(lipgloss.Color("#DE684F"))
 	focusedModelInvalidStyle = lipgloss.NewStyle().
 					Width(9).
 					Height(2).
 					Align(lipgloss.Center, lipgloss.Center).
-					BorderStyle(lipgloss.HiddenBorder()).
-					Background(lipgloss.Color("#808080"))
+					BorderStyle(lipgloss.NormalBorder()).
+					BorderForeground(lipgloss.Color("#808080"))
 	todayStyle = lipgloss.NewStyle().
 			Width(9).
 			Height(2).

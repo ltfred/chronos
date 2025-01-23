@@ -14,3 +14,8 @@ func GetLunarCalendar(t time.Time) string {
 	}
 	return lunar
 }
+
+// IsWeekend 是否为周末
+func IsWeekend(t time.Time) bool {
+	return t.Weekday() == time.Sunday || t.Weekday() == time.Saturday
+}

@@ -133,19 +133,23 @@ func (m DayModel) View() string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
 			calendar := utils.GetLunarCalendar(v.time)
+			symbol := "\n"
+			if utils.IsWeekend(v.time) {
+				symbol = redTextStyle.Render("末")
+			}
 			if v.pos == m.cursor {
-				s := focusedModelStyle.Render(onlyDayFormat(v.time), "休", calendar)
+				s := focusedModelStyle.Render(boldTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar)
 				if v.isInvalid {
-					s = focusedModelInvalidStyle.Render(onlyDayFormat(v.time), "\n", calendar)
+					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar)
 				}
 				ss = append(ss, s)
 				continue
 			}
 			if v.isInvalid {
-				ss = append(ss, modelStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), "\n", calendar))
+				ss = append(ss, modelStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(onlyDayFormat(v.time), "\n", calendar))
+			ss = append(ss, modelStyle.Render(boldTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
