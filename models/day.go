@@ -114,6 +114,8 @@ func (m DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.cursor += 1
 			return m, nil
+		case "y":
+			return NewMonthModel(m.choices[m.cursor].time.Year()), nil
 		default:
 		}
 	}
@@ -127,36 +129,24 @@ func (m DayModel) View() string {
 	for i := 0; i < rowCount; i++ {
 		rows = append(rows, m.choices[i*7:(i+1)*7])
 	}
-	onlyDayFormat := func(t time.Time) string {
-		return t.Format("02")
-	}
 	joinHorizontal := func(choices []dayChoice) string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
-			symbol := "\n"
-			calendar := utils.GetLunarCalendar(v.time)
-			if utils.IsWeekend(v.time) {
-				symbol = redTextStyle.Render("末")
-			}
-			holidays, ok := constants.Holidays[v.time.Year()]
-			if ok {
-				if _, ok := holidays[v.time.Format("01-02")]; ok {
-					symbol = redTextStyle.Render("休")
-				}
-			}
+			day := utils.OnlyDayFormat(v.time)
+			workState, lunar := getWorkAndLunar(v.time)
 			if v.pos == m.cursor {
-				s := focusedModelStyle.Render(boldTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar)
+				s := focusedModelStyle.Render(boldTextStyle.Render(day), workState, lunar)
 				if v.isInvalid {
-					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar)
+					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(day), workState, lunar)
 				}
 				ss = append(ss, s)
 				continue
 			}
 			if v.isInvalid {
-				ss = append(ss, modelStyle.Render(grayTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar))
+				ss = append(ss, modelStyle.Render(grayTextStyle.Render(day), workState, lunar))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(boldTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar))
+			ss = append(ss, modelStyle.Render(boldTextStyle.Render(day), workState, lunar))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
@@ -174,4 +164,23 @@ func (m DayModel) View() string {
 	s := lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...)
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, s, focusedModelInvalidStyle.Render("日期详情"))
+}
+
+func getWorkAndLunar(t time.Time) (string, string) {
+	workState, lunar := "\n", utils.GetLunarCalendar(t)
+	if utils.IsWeekend(t) {
+		workState = redTextStyle.Render("末")
+	}
+	_, ok := constants.WorkDays[t.Format("2006-01-02")]
+	if ok {
+		workState = redTextStyle.Render("班")
+	}
+	holidays, ok := constants.Holidays[t.Year()]
+	if ok {
+		if holiday, ok := holidays[t.Format("01-02")]; ok {
+			workState = redTextStyle.Render("休")
+			lunar = string(holiday)
+		}
+	}
+	return workState, lunar
 }

@@ -19,3 +19,7 @@ func GetLunarCalendar(t time.Time) string {
 func IsWeekend(t time.Time) bool {
 	return t.Weekday() == time.Sunday || t.Weekday() == time.Saturday
 }
+
+func OnlyDayFormat(t time.Time) string {
+	return t.Format("02")
+}
