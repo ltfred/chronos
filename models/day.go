@@ -3,6 +3,7 @@ package models
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/ltfred/chronos/constants"
 	"github.com/ltfred/chronos/utils"
 	"time"
 )
@@ -132,10 +133,16 @@ func (m DayModel) View() string {
 	joinHorizontal := func(choices []dayChoice) string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
-			calendar := utils.GetLunarCalendar(v.time)
 			symbol := "\n"
+			calendar := utils.GetLunarCalendar(v.time)
 			if utils.IsWeekend(v.time) {
 				symbol = redTextStyle.Render("末")
+			}
+			holidays, ok := constants.Holidays[v.time.Year()]
+			if ok {
+				if _, ok := holidays[v.time.Format("01-02")]; ok {
+					symbol = redTextStyle.Render("休")
+				}
 			}
 			if v.pos == m.cursor {
 				s := focusedModelStyle.Render(boldTextStyle.Render(onlyDayFormat(v.time)), symbol, calendar)
