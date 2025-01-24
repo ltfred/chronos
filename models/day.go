@@ -90,7 +90,7 @@ func (m DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "down", "j":
-			if m.cursor+7 > len(m.choices) {
+			if m.cursor+7 >= len(m.choices) {
 				return m, nil
 			}
 			m.cursor += 7
@@ -108,7 +108,7 @@ func (m DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.cursor -= 1
 			return m, nil
 		case "right", "l":
-			if m.cursor+1 > len(m.choices) {
+			if m.cursor+1 >= len(m.choices) {
 				return m, nil
 			}
 			m.cursor += 1
