@@ -137,13 +137,13 @@ func (m DayModel) View() string {
 			if v.pos == m.cursor {
 				s := focusedModelStyle.Render(boldTextStyle.Render(day), workState, lunar)
 				if v.isInvalid {
-					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(day), workState, lunar)
+					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar))
 				}
 				ss = append(ss, s)
 				continue
 			}
 			if v.isInvalid {
-				ss = append(ss, modelStyle.Render(grayTextStyle.Render(day), workState, lunar))
+				ss = append(ss, modelStyle.Render(grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar)))
 				continue
 			}
 			ss = append(ss, modelStyle.Render(boldTextStyle.Render(day), workState, lunar))
