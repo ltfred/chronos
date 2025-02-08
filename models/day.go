@@ -9,10 +9,9 @@ import (
 )
 
 type dayChoice struct {
-	time       time.Time
-	pos        int
-	isSelected bool
-	isInvalid  bool
+	time      time.Time
+	pos       int
+	isInvalid bool
 }
 
 type DayModel struct {
@@ -23,6 +22,7 @@ type DayModel struct {
 func NewDayModel(year, month int) DayModel {
 	firstDay := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	lastDay := time.Date(year, time.Month(month)+1, 1, 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
+	now := time.Now()
 
 	week := int(firstDay.Weekday())
 	if week == 0 {
@@ -47,9 +47,8 @@ func NewDayModel(year, month int) DayModel {
 	for i := 1; i <= lastDay.Day(); i++ {
 		cur := time.Date(year, time.Month(month), i, 0, 0, 0, 0, time.Local)
 		c := dayChoice{time: cur, pos: pos}
-		y, m, d := time.Now().Date()
-		if cur.Year() == y && cur.Month() == m {
-			if cur.Day() == d {
+		if cur.Year() == now.Year() && cur.Month() == now.Month() {
+			if cur.Day() == now.Day() {
 				dayModel.cursor = c.pos
 				isSetMothFirstDaySelected = false
 			}
@@ -58,7 +57,7 @@ func NewDayModel(year, month int) DayModel {
 		pos += 1
 	}
 	if isSetMothFirstDaySelected {
-		curMonthDays[0].isSelected = true
+		dayModel.cursor = curMonthDays[0].pos
 	}
 	nextMonthDays := make([]dayChoice, 0, 7-week)
 	week = int(lastDay.Weekday())
