@@ -1,10 +1,13 @@
 package models
 
 import (
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/dromara/carbon/v2"
 	"github.com/ltfred/chronos/constants"
 	"github.com/ltfred/chronos/utils"
+	"strings"
 	"time"
 )
 
@@ -128,12 +131,14 @@ func (m DayModel) View() string {
 	for i := 0; i < rowCount; i++ {
 		rows = append(rows, m.choices[i*7:(i+1)*7])
 	}
+	var selectDay dayChoice
 	joinHorizontal := func(choices []dayChoice) string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
 			day := utils.OnlyDayFormat(v.time)
 			workState, lunar := getWorkAndLunar(v.time)
 			if v.pos == m.cursor {
+				selectDay = v
 				s := focusedModelStyle.Render(boldTextStyle.Render(day), workState, lunar)
 				if v.isInvalid {
 					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar))
@@ -162,7 +167,18 @@ func (m DayModel) View() string {
 
 	s := lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...)
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, s, focusedModelInvalidStyle.Render("日期详情"))
+	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(getDayDetail(selectDay.time)))
+}
+
+func getDayDetail(day time.Time) string {
+	items := make([]string, 0, 5)
+	date := day.Format("2006-01-02")
+	items = append(items, fmt.Sprintf("公历：%s", date))
+	lunar := carbon.Parse(date).Lunar()
+	items = append(items, fmt.Sprintf("农历：%s", lunar.ToDateString()))
+	items = append(items, fmt.Sprintf("生肖：%s", lunar.Animal()))
+
+	return strings.Join(items, "\n")
 }
 
 func getWorkAndLunar(t time.Time) (string, string) {

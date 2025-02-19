@@ -35,8 +35,13 @@ var (
 			Width(9).
 			Height(1).
 			Bold(true).
-			BorderStyle(lipgloss.NormalBorder()).
+			BorderStyle(lipgloss.HiddenBorder()).
 			Align(lipgloss.Center, lipgloss.Center)
+	dayDetailStyle = lipgloss.NewStyle().
+			Bold(true).
+			Align(lipgloss.Left, lipgloss.Center).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("#DE684F"))
 )
 
 // month
