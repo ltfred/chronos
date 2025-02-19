@@ -178,6 +178,13 @@ func getDayDetail(day time.Time) string {
 	items = append(items, fmt.Sprintf("农历：%s", lunar.ToDateString()))
 	items = append(items, fmt.Sprintf("生肖：%s", lunar.Animal()))
 
+	holidays, ok := constants.Holidays[day.Year()]
+	if ok {
+		if holiday, ok := holidays[day.Format("01-02")]; ok {
+			items = append(items, fmt.Sprintf("节日：%s", holiday))
+		}
+	}
+
 	return strings.Join(items, "\n")
 }
 

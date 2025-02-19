@@ -40,8 +40,7 @@ var (
 	dayDetailStyle = lipgloss.NewStyle().
 			Bold(true).
 			Align(lipgloss.Left, lipgloss.Center).
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(lipgloss.Color("#DE684F"))
+			BorderStyle(lipgloss.HiddenBorder())
 )
 
 // month
