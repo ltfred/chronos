@@ -19,9 +19,8 @@ type dayChoice struct {
 }
 
 type DayModel struct {
-	choices        []dayChoice
-	cursor         int
-	isImportantDay bool
+	choices []dayChoice
+	cursor  int
 }
 
 func NewDayModel(year, month int) DayModel {
@@ -139,20 +138,21 @@ func (model DayModel) View() string {
 		for _, v := range choices {
 			day := utils.OnlyDayFormat(v.time)
 			workState, lunar := model.getWorkAndLunar(v.time)
+			importantDayMark := model.getImportantDayMark(v.time)
 			if v.pos == model.cursor {
 				selectDay = v
-				s := focusedModelStyle.Render(boldTextStyle.Render(day), workState, lunar)
+				s := focusedModelStyle.Render(importantDayMark, boldTextStyle.Render(day), workState, lunar)
 				if v.isInvalid {
-					s = focusedModelInvalidStyle.Render(grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar))
+					s = focusedModelInvalidStyle.Render(importantDayMark, grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar))
 				}
 				ss = append(ss, s)
 				continue
 			}
 			if v.isInvalid {
-				ss = append(ss, modelStyle.Render(grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar)))
+				ss = append(ss, modelStyle.Render(importantDayMark, grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar)))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(boldTextStyle.Render(day), workState, lunar))
+			ss = append(ss, modelStyle.Render(importantDayMark, boldTextStyle.Render(day), workState, lunar))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
@@ -259,8 +259,15 @@ func (model DayModel) genImportantDayStr(curDay time.Time, day internal.Day) str
 		m, d = time.Month(l.Month()), l.Day()
 	}
 	if m == t.Month() && d == t.Day() {
-		model.isImportantDay = true
 		return fmt.Sprintf("• %s（%s%s）", day.Name, lunarStr, day.Date)
+	}
+	return ""
+}
+
+func (model DayModel) getImportantDayMark(day time.Time) string {
+	isImportDay := model.getBirthDayDay(day) != "" || model.getMemorialDay(day) != ""
+	if isImportDay {
+		return "🌟"
 	}
 	return ""
 }
