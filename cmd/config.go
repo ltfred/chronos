@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/ltfred/chronos/internal"
 	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
@@ -18,16 +19,11 @@ func init() {
 }
 
 func initConfig(cmd *cobra.Command, args []string) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		os.Exit(1)
-	}
-	path := homeDir + "/.config/chronos/config.toml"
-	command := exec.Command("vim", path)
+	command := exec.Command("vim", internal.GetConfigPath())
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
-	if err = command.Run(); err != nil {
+	if err := command.Run(); err != nil {
 		cmd.PrintErrf("Error: %v\n", err)
 		os.Exit(1)
 	}

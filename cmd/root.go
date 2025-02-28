@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/ltfred/chronos/internal"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/ltfred/chronos/models"
 	"github.com/spf13/cobra"
@@ -33,4 +35,8 @@ func run(cmd *cobra.Command, args []string) {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
+}
+
+func init() {
+	cobra.OnInitialize(internal.SetupConfig)
 }
