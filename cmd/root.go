@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -31,10 +30,8 @@ func run(cmd *cobra.Command, args []string) {
 	now := time.Now()
 	dayModel := models.NewDayModel(now.Year(), int(now.Month()))
 	p := tea.NewProgram(dayModel)
-	if _, err := p.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
-		os.Exit(1)
-	}
+	_, err := p.Run()
+	cobra.CheckErr(err)
 }
 
 func init() {

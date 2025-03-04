@@ -23,8 +23,5 @@ func initConfig(cmd *cobra.Command, args []string) {
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
-	if err := command.Run(); err != nil {
-		cmd.PrintErrf("Error: %v\n", err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(command.Run())
 }

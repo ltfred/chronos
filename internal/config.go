@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"bytes"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 )
@@ -25,15 +27,25 @@ type Day struct {
 func SetupConfig() {
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(GetConfigPath())
-	if err := viper.ReadInConfig(); err != nil {
-
-	}
-	if err := viper.Unmarshal(&Cfg); err != nil {
-
-	}
+	cobra.CheckErr(viper.ReadInConfig())
+	cobra.CheckErr(viper.Unmarshal(&Cfg))
 }
 
 func GetConfigPath() string {
 	homeDir, _ := os.UserHomeDir()
 	return homeDir + "/.config/chronos/config.toml"
+}
+
+var config = `
+name = "chronos"
+
+[importantDay]
+birthdays = [{name = "My birthday", date = "03-04", isLunar = false},{name = "Mom birthday", date = "03-07",isLunar = true}]
+`
+
+func InitConfigFile() {
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(GetConfigPath())
+	cobra.CheckErr(viper.ReadConfig(bytes.NewBuffer([]byte(config))))
+	cobra.CheckErr(viper.WriteConfig())
 }

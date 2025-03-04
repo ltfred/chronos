@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -25,8 +23,6 @@ func init() {
 func runMonth(cmd *cobra.Command, args []string) {
 	monthModel := models.NewMonthModel(time.Now().Year())
 	p := tea.NewProgram(monthModel)
-	if _, err := p.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
-		os.Exit(1)
-	}
+	_, err := p.Run()
+	cobra.CheckErr(err)
 }
