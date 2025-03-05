@@ -7,9 +7,8 @@ import (
 )
 
 type monthChoice struct {
-	time       time.Time
-	pos        int
-	isSelected bool
+	time time.Time
+	pos  int
 }
 
 type MonthModel struct {
@@ -17,20 +16,22 @@ type MonthModel struct {
 	cursor  int
 }
 
-func NewMonthModel(year int) MonthModel {
+func NewMonthModel(year int, month time.Month) MonthModel {
 	choices := make([]monthChoice, 12)
+	monthModel := MonthModel{}
 	for i := 0; i < 12; i++ {
+		t := time.Date(year, time.Month(i+1), 1, 0, 0, 0, 0, time.Local)
 		choice := monthChoice{
-			time: time.Date(year, time.Month(i+1), 1, 0, 0, 0, 0, time.Local),
+			time: t,
 			pos:  i,
 		}
-		now := time.Now()
-		if now.Year() == year && now.Month() == time.Month(i+1) {
-			choice.isSelected = true
+		if t.Year() == year && t.Month() == month {
+			monthModel.cursor = i
 		}
 		choices[i] = choice
 	}
-	return MonthModel{choices: choices}
+	monthModel.choices = choices
+	return monthModel
 }
 
 func (m MonthModel) Init() tea.Cmd {

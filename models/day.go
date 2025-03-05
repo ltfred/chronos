@@ -118,7 +118,8 @@ func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			model.cursor += 1
 			return model, nil
 		case "m":
-			return NewMonthModel(model.choices[model.cursor].time.Year()), nil
+			t := model.choices[model.cursor].time
+			return NewMonthModel(t.Year(), t.Month()), nil
 		default:
 		}
 	}
