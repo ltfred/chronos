@@ -1,8 +1,11 @@
 package models
 
 import (
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/dromara/carbon/v2"
+	"github.com/ltfred/chronos/internal"
 	"time"
 )
 
@@ -84,13 +87,35 @@ func (m MonthModel) View() string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
 			if v.pos == m.cursor {
-				ss = append(ss, monthFocusedModelStyle.Render(v.time.Format("2006-01")))
+				ss = append(ss, monthFocusedModelStyle.Render(m.genMonthStr(v.time.Year(), v.time.Month())))
 				continue
 			}
-			ss = append(ss, monthModelStyle.Render(v.time.Format("2006-01")))
+			ss = append(ss, monthModelStyle.Render(m.genMonthStr(v.time.Year(), v.time.Month())))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
 	s := lipgloss.JoinVertical(lipgloss.Top, joinHorizontal(h1), joinHorizontal(h2), joinHorizontal(h3))
 	return s
+}
+
+func (m MonthModel) genMonthStr(year int, month time.Month) string {
+	f := func(days []internal.Day) bool {
+		for _, day := range days {
+			parse, _ := time.Parse("01-02", day.Date)
+			if day.IsLunar {
+				mm := carbon.CreateFromLunar(year, int(parse.Month()), parse.Day(), 0, 0, 0, false).Month()
+				if mm == int(month) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	if f(internal.Cfg.ImportantDay.Birthdays) {
+		return fmt.Sprintf("🌟%d-%d", year, month)
+	}
+	if f(internal.Cfg.ImportantDay.MemorialDays) {
+		return fmt.Sprintf("🌟%d-%02d", year, month)
+	}
+	return fmt.Sprintf("%d-%02d", year, month)
 }
