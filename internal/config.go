@@ -41,6 +41,7 @@ name = "chronos"
 
 [importantDay]
 birthdays = [{name = "My birthday", date = "03-04", isLunar = false},{name = "Mom birthday", date = "03-07",isLunar = true}]
+memorialDays = [{name = "Wedding anniversary", date = "12-25"}]
 `
 
 func InitConfigFile() {

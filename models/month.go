@@ -107,6 +107,10 @@ func (m MonthModel) genMonthStr(year int, month time.Month) string {
 				if mm == int(month) {
 					return true
 				}
+			} else {
+				if parse.Month() == month {
+					return true
+				}
 			}
 		}
 		return false

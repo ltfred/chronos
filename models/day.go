@@ -228,7 +228,7 @@ func (model DayModel) getBirthDayDay(day time.Time) string {
 		return ""
 	}
 
-	return fmt.Sprintf("🎂:\n	%s", strings.Join(items, "\n	"))
+	return fmt.Sprintf("\n🎂:\n	%s", strings.Join(items, "\n	"))
 }
 
 func (model DayModel) getMemorialDay(day time.Time) string {
@@ -243,7 +243,7 @@ func (model DayModel) getMemorialDay(day time.Time) string {
 		return ""
 	}
 
-	return fmt.Sprintf("🎉:\n	%s", strings.Join(items, "\n	"))
+	return fmt.Sprintf("\n🎉：\n	%s", strings.Join(items, "\n	"))
 }
 
 func (model DayModel) genImportantDayStr(curDay time.Time, day internal.Day) string {
