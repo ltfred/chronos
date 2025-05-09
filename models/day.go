@@ -19,8 +19,9 @@ type dayChoice struct {
 }
 
 type DayModel struct {
-	choices []dayChoice
-	cursor  int
+	choices     []dayChoice
+	month, year int
+	cursor      int
 }
 
 func NewDayModel(year, month int) DayModel {
@@ -32,7 +33,7 @@ func NewDayModel(year, month int) DayModel {
 	if week == 0 {
 		week = 7
 	}
-	dayModel := DayModel{}
+	dayModel := DayModel{month: month, year: year}
 
 	var pos int
 	preMonthDays := make([]dayChoice, 0, week-1)
@@ -120,6 +121,16 @@ func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "m":
 			t := model.choices[model.cursor].time
 			return NewMonthModel(t.Year(), t.Month()), nil
+		case "n":
+			if model.month+1 > 12 {
+				return model, nil
+			}
+			return NewDayModel(model.year, model.month+1), nil
+		case "p":
+			if model.month-1 < 1 {
+				return model, nil
+			}
+			return NewDayModel(model.year, model.month-1), nil
 		default:
 		}
 	}
