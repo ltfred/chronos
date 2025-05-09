@@ -1,27 +1,26 @@
 package cmd
 
 import (
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/ltfred/chronos/internal"
+	"github.com/ltfred/chronos/models"
 	"github.com/spf13/cobra"
-	"os"
-	"os/exec"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Edit config file",
-	Run:   initConfig,
+	Run:   config,
 }
 
 func init() {
 	rootCmd.AddCommand(configCmd)
 }
 
-func initConfig(cmd *cobra.Command, args []string) {
-	command := exec.Command("vim", internal.GetConfigPath())
-	command.Stdin = os.Stdin
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	cobra.CheckErr(command.Run())
+func config(cmd *cobra.Command, args []string) {
+	model := models.NewConfigModel(internal.OriginCfg)
+	t := tea.NewProgram(model, tea.WithAltScreen())
+	_, err := t.Run()
+	cobra.CheckErr(err)
 }

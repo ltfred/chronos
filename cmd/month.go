@@ -22,7 +22,7 @@ func init() {
 
 func runMonth(cmd *cobra.Command, args []string) {
 	monthModel := models.NewMonthModel(time.Now().Year(), time.Now().Month())
-	p := tea.NewProgram(monthModel)
+	p := tea.NewProgram(monthModel, tea.WithAltScreen())
 	_, err := p.Run()
 	cobra.CheckErr(err)
 }

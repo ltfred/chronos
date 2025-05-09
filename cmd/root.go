@@ -29,7 +29,7 @@ func Execute() {
 func run(cmd *cobra.Command, args []string) {
 	now := time.Now()
 	dayModel := models.NewDayModel(now.Year(), int(now.Month()))
-	p := tea.NewProgram(dayModel)
+	p := tea.NewProgram(dayModel, tea.WithAltScreen())
 	_, err := p.Run()
 	cobra.CheckErr(err)
 }
