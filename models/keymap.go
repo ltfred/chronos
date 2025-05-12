@@ -65,3 +65,16 @@ func newEnterKeymap() enterKeymap {
 		),
 	}
 }
+
+type todayKeymap struct {
+	today key.Binding
+}
+
+func newTodayKeymap() todayKeymap {
+	return todayKeymap{
+		today: key.NewBinding(
+			key.WithKeys("t"),
+			key.WithHelp("t", "today"),
+		),
+	}
+}

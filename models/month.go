@@ -20,6 +20,7 @@ type monthKeymap struct {
 	enterKeymap
 	moveKeymap
 	quitKeymap
+	todayKeymap
 }
 
 type MonthModel struct {
@@ -49,6 +50,7 @@ func NewMonthModel(year int, month time.Month) MonthModel {
 		enterKeymap: newEnterKeymap(),
 		moveKeymap:  newMoveKeymap(),
 		quitKeymap:  newQuitKeymap(),
+		todayKeymap: newTodayKeymap(),
 	}
 	monthModel.keymap = k
 	return monthModel
@@ -91,6 +93,9 @@ func (m MonthModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.enter):
 			dayModel := NewDayModel(m.choices[m.cursor].time.Year(), int(m.choices[m.cursor].time.Month()))
 			return dayModel, nil
+		case key.Matches(msg, m.keymap.today):
+			dayModel := NewDayModel(time.Now().Year(), int(time.Now().Month()))
+			return dayModel, nil
 		}
 	}
 
@@ -104,6 +109,7 @@ func (m MonthModel) View() string {
 		m.keymap.left,
 		m.keymap.right,
 		m.keymap.enter,
+		m.keymap.today,
 		m.keymap.quit,
 	})
 	h1, h2, h3 := m.choices[:4], m.choices[4:8], m.choices[8:]

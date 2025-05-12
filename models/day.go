@@ -24,6 +24,7 @@ type dayKeymap struct {
 	preMonth, nextMonth, month key.Binding
 	moveKeymap
 	quitKeymap
+	todayKeymap
 }
 
 type DayModel struct {
@@ -106,6 +107,7 @@ func NewDayModel(year, month int) DayModel {
 			key.WithKeys("m"),
 			key.WithHelp("m", "month"),
 		),
+		todayKeymap: newTodayKeymap(),
 	}
 	dayModel.keymap = k
 
@@ -146,6 +148,8 @@ func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			model.cursor += 1
 			return model, nil
+		case key.Matches(msg, model.keymap.today):
+			return NewDayModel(time.Now().Year(), int(time.Now().Month())), nil
 		}
 		switch msg.String() {
 		case "m":
@@ -177,6 +181,7 @@ func (model DayModel) View() string {
 		model.keymap.preMonth,
 		model.keymap.nextMonth,
 		model.keymap.month,
+		model.keymap.today,
 		model.keymap.quit,
 	})
 

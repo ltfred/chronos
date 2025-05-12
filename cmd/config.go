@@ -10,7 +10,7 @@ import (
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Edit config file",
+	Short: "Edit configuration file",
 	Run:   config,
 }
 
