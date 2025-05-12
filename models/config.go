@@ -10,12 +10,12 @@ import (
 )
 
 type ConfigModel struct {
-	keymap   keymap
+	keymap   configKeymap
 	help     help.Model
 	textarea textarea.Model
 }
 
-type keymap struct {
+type configKeymap struct {
 	save, quit key.Binding
 }
 
@@ -26,7 +26,7 @@ func NewConfigModel(cfg string) ConfigModel {
 	ti.SetValue(cfg)
 	ti.FocusedStyle.CursorLine = cursorLineStyle
 	ti.FocusedStyle.Base = textAreaFocusStyle
-	k := keymap{
+	k := configKeymap{
 		save: key.NewBinding(
 			key.WithKeys("ctrl+s"),
 			key.WithHelp("ctrl+s", "save"),
@@ -71,7 +71,7 @@ func (m ConfigModel) View() string {
 	})
 
 	return fmt.Sprintf(
-		"Edit config.\n\n%s",
+		"Edit your configuration.\n\n%s",
 		m.textarea.View(),
 	) + "\n\n" + helpMsg
 }

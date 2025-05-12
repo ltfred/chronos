@@ -2,6 +2,8 @@ package models
 
 import (
 	"fmt"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/dromara/carbon/v2"
@@ -18,10 +20,16 @@ type dayChoice struct {
 	isInvalid bool
 }
 
+type dayKeymap struct {
+	up, down, left, right, preMonth, nextMonth, month, quit key.Binding
+}
+
 type DayModel struct {
 	choices     []dayChoice
 	month, year int
 	cursor      int
+	help        help.Model
+	keymap      dayKeymap
 }
 
 func NewDayModel(year, month int) DayModel {
@@ -33,7 +41,7 @@ func NewDayModel(year, month int) DayModel {
 	if week == 0 {
 		week = 7
 	}
-	dayModel := DayModel{month: month, year: year}
+	dayModel := DayModel{month: month, year: year, help: help.New()}
 
 	var pos int
 	preMonthDays := make([]dayChoice, 0, week-1)
@@ -80,6 +88,42 @@ func NewDayModel(year, month int) DayModel {
 	dayModel.choices = append(dayModel.choices, preMonthDays...)
 	dayModel.choices = append(dayModel.choices, curMonthDays...)
 	dayModel.choices = append(dayModel.choices, nextMonthDays...)
+
+	k := dayKeymap{
+		up: key.NewBinding(
+			key.WithKeys("up", "k"),
+			key.WithHelp("↑/k", "up"),
+		),
+		down: key.NewBinding(
+			key.WithKeys("down", "j"),
+			key.WithHelp("↓/j", "down"),
+		),
+		left: key.NewBinding(
+			key.WithKeys("left", "h"),
+			key.WithHelp("←/h", "left"),
+		),
+		right: key.NewBinding(
+			key.WithKeys("right", "l"),
+			key.WithHelp("→/l", "right"),
+		),
+		preMonth: key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", "preMonth"),
+		),
+		nextMonth: key.NewBinding(
+			key.WithKeys("n"),
+			key.WithHelp("n", "nextMonth"),
+		),
+		month: key.NewBinding(
+			key.WithKeys("m"),
+			key.WithHelp("m", "month"),
+		),
+		quit: key.NewBinding(
+			key.WithKeys("ctrl+c"),
+			key.WithHelp("ctrl+c", "quit"),
+		),
+	}
+	dayModel.keymap = k
 
 	return dayModel
 }
@@ -139,6 +183,17 @@ func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (model DayModel) View() string {
+	helpMsg := model.help.ShortHelpView([]key.Binding{
+		model.keymap.up,
+		model.keymap.down,
+		model.keymap.left,
+		model.keymap.right,
+		model.keymap.preMonth,
+		model.keymap.nextMonth,
+		model.keymap.month,
+		model.keymap.quit,
+	})
+
 	rowCount := len(model.choices) / 7
 	rows := make([][]dayChoice, 0, rowCount)
 	for i := 0; i < rowCount; i++ {
@@ -181,7 +236,7 @@ func (model DayModel) View() string {
 
 	s := lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...)
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(model.getDayDetail(selectDay.time)))
+	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(model.getDayDetail(selectDay.time))) + "\n\n" + helpMsg
 }
 
 func (model DayModel) getDayDetail(day time.Time) string {
