@@ -21,7 +21,9 @@ type dayChoice struct {
 }
 
 type dayKeymap struct {
-	up, down, left, right, preMonth, nextMonth, month, quit key.Binding
+	preMonth, nextMonth, month key.Binding
+	moveKeymap
+	quitKeymap
 }
 
 type DayModel struct {
@@ -90,22 +92,8 @@ func NewDayModel(year, month int) DayModel {
 	dayModel.choices = append(dayModel.choices, nextMonthDays...)
 
 	k := dayKeymap{
-		up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("↑/k", "up"),
-		),
-		down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("↓/j", "down"),
-		),
-		left: key.NewBinding(
-			key.WithKeys("left", "h"),
-			key.WithHelp("←/h", "left"),
-		),
-		right: key.NewBinding(
-			key.WithKeys("right", "l"),
-			key.WithHelp("→/l", "right"),
-		),
+		moveKeymap: newMoveKeymap(),
+		quitKeymap: newQuitKeymap(),
 		preMonth: key.NewBinding(
 			key.WithKeys("p"),
 			key.WithHelp("p", "preMonth"),
@@ -117,10 +105,6 @@ func NewDayModel(year, month int) DayModel {
 		month: key.NewBinding(
 			key.WithKeys("m"),
 			key.WithHelp("m", "month"),
-		),
-		quit: key.NewBinding(
-			key.WithKeys("ctrl+c"),
-			key.WithHelp("ctrl+c", "quit"),
 		),
 	}
 	dayModel.keymap = k
@@ -135,33 +119,35 @@ func (model DayModel) Init() tea.Cmd {
 func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
+		switch {
+		case key.Matches(msg, model.keymap.quit):
 			return model, tea.Quit
-		case "down", "j":
-			if model.cursor+7 >= len(model.choices) {
-				return model, nil
-			}
-			model.cursor += 7
-			return model, nil
-		case "up", "k":
+		case key.Matches(msg, model.keymap.up):
 			if model.cursor-7 < 0 {
 				return model, nil
 			}
 			model.cursor -= 7
 			return model, nil
-		case "left", "h":
+		case key.Matches(msg, model.keymap.down):
+			if model.cursor+7 >= len(model.choices) {
+				return model, nil
+			}
+			model.cursor += 7
+			return model, nil
+		case key.Matches(msg, model.keymap.left):
 			if model.cursor-1 < 0 {
 				return model, nil
 			}
 			model.cursor -= 1
 			return model, nil
-		case "right", "l":
+		case key.Matches(msg, model.keymap.right):
 			if model.cursor+1 >= len(model.choices) {
 				return model, nil
 			}
 			model.cursor += 1
 			return model, nil
+		}
+		switch msg.String() {
 		case "m":
 			t := model.choices[model.cursor].time
 			return NewMonthModel(t.Year(), t.Month()), nil

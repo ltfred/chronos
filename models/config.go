@@ -16,7 +16,8 @@ type ConfigModel struct {
 }
 
 type configKeymap struct {
-	save, quit key.Binding
+	saveKeymap
+	quitKeymap
 }
 
 func NewConfigModel(cfg string) ConfigModel {
@@ -27,14 +28,8 @@ func NewConfigModel(cfg string) ConfigModel {
 	ti.FocusedStyle.CursorLine = cursorLineStyle
 	ti.FocusedStyle.Base = textAreaFocusStyle
 	k := configKeymap{
-		save: key.NewBinding(
-			key.WithKeys("ctrl+s"),
-			key.WithHelp("ctrl+s", "save"),
-		),
-		quit: key.NewBinding(
-			key.WithKeys("ctrl+c"),
-			key.WithHelp("ctrl+c", "quit"),
-		),
+		saveKeymap: newSaveKeymap(),
+		quitKeymap: newQuitKeymap(),
 	}
 
 	return ConfigModel{
@@ -53,10 +48,11 @@ func (m ConfigModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
+		switch {
+		case key.Matches(msg, m.keymap.quit):
 			return m, tea.Quit
-		case "ctrl+s":
+		case key.Matches(msg, m.keymap.save):
+			// todo save
 		}
 	}
 

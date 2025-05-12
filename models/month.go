@@ -17,7 +17,9 @@ type monthChoice struct {
 }
 
 type monthKeymap struct {
-	up, down, left, right, enter, quit key.Binding
+	enterKeymap
+	moveKeymap
+	quitKeymap
 }
 
 type MonthModel struct {
@@ -44,30 +46,9 @@ func NewMonthModel(year int, month time.Month) MonthModel {
 	monthModel.choices = choices
 
 	k := monthKeymap{
-		up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("↑/k", "up"),
-		),
-		down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("↓/j", "down"),
-		),
-		left: key.NewBinding(
-			key.WithKeys("left", "h"),
-			key.WithHelp("←/h", "left"),
-		),
-		right: key.NewBinding(
-			key.WithKeys("right", "l"),
-			key.WithHelp("→/l", "right"),
-		),
-		enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "days"),
-		),
-		quit: key.NewBinding(
-			key.WithKeys("ctrl+c"),
-			key.WithHelp("ctrl+c", "quit"),
-		),
+		enterKeymap: newEnterKeymap(),
+		moveKeymap:  newMoveKeymap(),
+		quitKeymap:  newQuitKeymap(),
 	}
 	monthModel.keymap = k
 	return monthModel
@@ -80,37 +61,36 @@ func (m MonthModel) Init() tea.Cmd {
 func (m MonthModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
+		switch {
+		case key.Matches(msg, m.keymap.quit):
 			return m, tea.Quit
-		case "down", "j":
-			if m.cursor+4 > 12 {
-				return m, nil
-			}
-			m.cursor += 4
-			return m, nil
-		case "up", "k":
+		case key.Matches(msg, m.keymap.up):
 			if m.cursor-4 < 0 {
 				return m, nil
 			}
 			m.cursor -= 4
 			return m, nil
-		case "left", "h":
-			if m.cursor-1 < 0 {
+		case key.Matches(msg, m.keymap.down):
+			if m.cursor+4 > 12 {
+				return m, nil
+			}
+			m.cursor += 4
+			return m, nil
+		case key.Matches(msg, m.keymap.left):
+			if m.cursor+1 > 12 {
 				return m, nil
 			}
 			m.cursor -= 1
 			return m, nil
-		case "right", "l":
-			if m.cursor+1 > 12 {
+		case key.Matches(msg, m.keymap.right):
+			if m.cursor-1 < 0 {
 				return m, nil
 			}
 			m.cursor += 1
 			return m, nil
-		case "enter":
+		case key.Matches(msg, m.keymap.enter):
 			dayModel := NewDayModel(m.choices[m.cursor].time.Year(), int(m.choices[m.cursor].time.Month()))
 			return dayModel, nil
-		default:
 		}
 	}
 
