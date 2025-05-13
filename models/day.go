@@ -97,11 +97,11 @@ func NewDayModel(year, month int) DayModel {
 		quitKeymap: newQuitKeymap(),
 		preMonth: key.NewBinding(
 			key.WithKeys("p"),
-			key.WithHelp("p", "preMonth"),
+			key.WithHelp("p", "pre month"),
 		),
 		nextMonth: key.NewBinding(
 			key.WithKeys("n"),
-			key.WithHelp("n", "nextMonth"),
+			key.WithHelp("n", "next month"),
 		),
 		month: key.NewBinding(
 			key.WithKeys("m"),
@@ -210,7 +210,7 @@ func (model DayModel) View() string {
 				ss = append(ss, modelStyle.Render(importantDayMark, grayTextStyle.Render(day), workState, grayTextStyle.Render(lunar)))
 				continue
 			}
-			ss = append(ss, modelStyle.Render(importantDayMark, boldTextStyle.Render(day), workState, lunar))
+			ss = append(ss, modelStyle.Render(importantDayMark, day, workState, lunar))
 		}
 		return lipgloss.JoinHorizontal(lipgloss.Top, ss...)
 	}
@@ -224,8 +224,7 @@ func (model DayModel) View() string {
 	for _, row := range rows {
 		horizontalJoins = append(horizontalJoins, joinHorizontal(row))
 	}
-
-	s := lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...)
+	s := borderStyle.Render(lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...))
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(model.getDayDetail(selectDay.time))) + "\n\n" + helpMsg
 }
