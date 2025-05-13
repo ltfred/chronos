@@ -114,90 +114,90 @@ func NewDayModel(year, month int) DayModel {
 	return dayModel
 }
 
-func (model DayModel) Init() tea.Cmd {
+func (m DayModel) Init() tea.Cmd {
 	return nil
 }
 
-func (model DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m DayModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, model.keymap.quit):
-			return model, tea.Quit
-		case key.Matches(msg, model.keymap.up):
-			if model.cursor-7 < 0 {
-				return model, nil
+		case key.Matches(msg, m.keymap.quit):
+			return m, tea.Quit
+		case key.Matches(msg, m.keymap.up):
+			if m.cursor-7 < 0 {
+				return m, nil
 			}
-			model.cursor -= 7
-			return model, nil
-		case key.Matches(msg, model.keymap.down):
-			if model.cursor+7 >= len(model.choices) {
-				return model, nil
+			m.cursor -= 7
+			return m, nil
+		case key.Matches(msg, m.keymap.down):
+			if m.cursor+7 >= len(m.choices) {
+				return m, nil
 			}
-			model.cursor += 7
-			return model, nil
-		case key.Matches(msg, model.keymap.left):
-			if model.cursor-1 < 0 {
-				return model, nil
+			m.cursor += 7
+			return m, nil
+		case key.Matches(msg, m.keymap.left):
+			if m.cursor-1 < 0 {
+				return m, nil
 			}
-			model.cursor -= 1
-			return model, nil
-		case key.Matches(msg, model.keymap.right):
-			if model.cursor+1 >= len(model.choices) {
-				return model, nil
+			m.cursor -= 1
+			return m, nil
+		case key.Matches(msg, m.keymap.right):
+			if m.cursor+1 >= len(m.choices) {
+				return m, nil
 			}
-			model.cursor += 1
-			return model, nil
-		case key.Matches(msg, model.keymap.today):
+			m.cursor += 1
+			return m, nil
+		case key.Matches(msg, m.keymap.today):
 			return NewDayModel(time.Now().Year(), int(time.Now().Month())), nil
 		}
 		switch msg.String() {
 		case "m":
-			t := model.choices[model.cursor].time
+			t := m.choices[m.cursor].time
 			return NewMonthModel(t.Year(), t.Month()), nil
 		case "n":
-			if model.month+1 > 12 {
-				return model, nil
+			if m.month+1 > 12 {
+				return m, nil
 			}
-			return NewDayModel(model.year, model.month+1), nil
+			return NewDayModel(m.year, m.month+1), nil
 		case "p":
-			if model.month-1 < 1 {
-				return model, nil
+			if m.month-1 < 1 {
+				return m, nil
 			}
-			return NewDayModel(model.year, model.month-1), nil
+			return NewDayModel(m.year, m.month-1), nil
 		default:
 		}
 	}
 
-	return model, nil
+	return m, nil
 }
 
-func (model DayModel) View() string {
-	helpMsg := model.help.ShortHelpView([]key.Binding{
-		model.keymap.up,
-		model.keymap.down,
-		model.keymap.left,
-		model.keymap.right,
-		model.keymap.preMonth,
-		model.keymap.nextMonth,
-		model.keymap.month,
-		model.keymap.today,
-		model.keymap.quit,
+func (m DayModel) View() string {
+	helpMsg := m.help.ShortHelpView([]key.Binding{
+		m.keymap.up,
+		m.keymap.down,
+		m.keymap.left,
+		m.keymap.right,
+		m.keymap.preMonth,
+		m.keymap.nextMonth,
+		m.keymap.month,
+		m.keymap.today,
+		m.keymap.quit,
 	})
 
-	rowCount := len(model.choices) / 7
+	rowCount := len(m.choices) / 7
 	rows := make([][]dayChoice, 0, rowCount)
 	for i := 0; i < rowCount; i++ {
-		rows = append(rows, model.choices[i*7:(i+1)*7])
+		rows = append(rows, m.choices[i*7:(i+1)*7])
 	}
 	var selectDay dayChoice
 	joinHorizontal := func(choices []dayChoice) string {
 		ss := make([]string, 0, 7)
 		for _, v := range choices {
 			day := utils.OnlyDayFormat(v.time)
-			workState, lunar := model.getWorkAndLunar(v.time)
-			importantDayMark := model.getImportantDayMark(v.time)
-			if v.pos == model.cursor {
+			workState, lunar := m.getWorkAndLunar(v.time)
+			importantDayMark := m.getImportantDayMark(v.time)
+			if v.pos == m.cursor {
 				selectDay = v
 				s := focusedModelStyle.Render(importantDayMark, boldTextStyle.Render(day), workState, lunar)
 				if v.isInvalid {
@@ -226,10 +226,10 @@ func (model DayModel) View() string {
 	}
 	s := borderStyle.Render(lipgloss.JoinVertical(lipgloss.Top, horizontalJoins...))
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(model.getDayDetail(selectDay.time))) + "\n\n" + helpMsg
+	return lipgloss.JoinHorizontal(lipgloss.Top, s, dayDetailStyle.Render(m.getDayDetail(selectDay.time))) + "\n\n" + helpMsg
 }
 
-func (model DayModel) getDayDetail(day time.Time) string {
+func (m DayModel) getDayDetail(day time.Time) string {
 	items := make([]string, 0, 5)
 	date := day.Format("2006-01-02")
 	items = append(items, fmt.Sprintf("阳历：%s（%s）", date, constants.Weekdays[day.Weekday().String()]))
@@ -243,17 +243,14 @@ func (model DayModel) getDayDetail(day time.Time) string {
 		}
 	}
 
-	if s := model.getBirthDayDay(day); s != "" {
-		items = append(items, s)
-	}
-	if s := model.getMemorialDay(day); s != "" {
+	if s := m.getDays(day); s != "" {
 		items = append(items, s)
 	}
 
 	return strings.Join(items, "\n")
 }
 
-func (model DayModel) getWorkAndLunar(t time.Time) (string, string) {
+func (m DayModel) getWorkAndLunar(t time.Time) (string, string) {
 	workState, lunar := "\n", utils.GetLunarCalendar(t)
 	if utils.IsWeekend(t) {
 		workState = redTextStyle.Render("末")
@@ -272,11 +269,11 @@ func (model DayModel) getWorkAndLunar(t time.Time) (string, string) {
 	return workState, lunar
 }
 
-func (model DayModel) getBirthDayDay(day time.Time) string {
-	birthdays := internal.Cfg.ImportantDay.Birthdays
-	items := make([]string, 0, len(birthdays))
-	for _, birthday := range birthdays {
-		if s := model.genImportantDayStr(day, birthday); s != "" {
+func (m DayModel) getDays(day time.Time) string {
+	days := internal.Cfg.Days
+	items := make([]string, 0, len(days))
+	for _, birthday := range days {
+		if s := m.genDayStr(day, birthday); s != "" {
 			items = append(items, s)
 		}
 	}
@@ -284,45 +281,30 @@ func (model DayModel) getBirthDayDay(day time.Time) string {
 		return ""
 	}
 
-	return fmt.Sprintf("\n🎂:\n	%s", strings.Join(items, "\n	"))
+	return fmt.Sprintf("\n🎉:\n	%s", strings.Join(items, "\n	"))
 }
 
-func (model DayModel) getMemorialDay(day time.Time) string {
-	memorialDays := internal.Cfg.ImportantDay.MemorialDays
-	items := make([]string, 0, len(memorialDays))
-	for _, memorialDay := range memorialDays {
-		if s := model.genImportantDayStr(day, memorialDay); s != "" {
-			items = append(items, s)
-		}
-	}
-	if len(items) == 0 {
-		return ""
-	}
-
-	return fmt.Sprintf("\n🎉：\n	%s", strings.Join(items, "\n	"))
-}
-
-func (model DayModel) genImportantDayStr(curDay time.Time, day internal.Day) string {
+func (m DayModel) genDayStr(curDay time.Time, day internal.Day) string {
 	t, err := time.Parse("01-02", day.Date)
 	if err != nil {
 		return ""
 	}
 
 	var lunarStr string
-	m, d := curDay.Month(), curDay.Day()
+	month, d := curDay.Month(), curDay.Day()
 	if day.IsLunar {
 		lunarStr = "阴历"
 		l := carbon.Parse(curDay.Format(time.DateOnly)).Lunar()
-		m, d = time.Month(l.Month()), l.Day()
+		month, d = time.Month(l.Month()), l.Day()
 	}
-	if m == t.Month() && d == t.Day() {
+	if month == t.Month() && d == t.Day() {
 		return fmt.Sprintf("• %s（%s%s）", day.Name, lunarStr, day.Date)
 	}
 	return ""
 }
 
-func (model DayModel) getImportantDayMark(day time.Time) string {
-	isImportDay := model.getBirthDayDay(day) != "" || model.getMemorialDay(day) != ""
+func (m DayModel) getImportantDayMark(day time.Time) string {
+	isImportDay := m.getDays(day) != ""
 	if isImportDay {
 		return "🌟"
 	}

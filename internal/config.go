@@ -12,12 +12,7 @@ var Cfg Config
 var OriginCfg string
 
 type Config struct {
-	ImportantDay ImportantDay `json:"importantDay"`
-}
-
-type ImportantDay struct {
-	Birthdays    []Day `json:"birthdays"`
-	MemorialDays []Day `json:"memorialDays"`
+	Days []Day `json:"days"`
 }
 
 type Day struct {
@@ -44,9 +39,10 @@ func GetConfigPath() string {
 var config = `
 name = "chronos"
 
-[importantDay]
-birthdays = [{name = "My birthday", date = "03-04", isLunar = false},{name = "Mom birthday", date = "03-07",isLunar = true}]
-memorialDays = [{name = "Wedding anniversary", date = "12-25"}]
+days = [
+{name = "My birthday", date = "03-04", isLunar = false},
+{name = "Mom birthday", date = "03-07",isLunar = true}
+]
 `
 
 func InitConfigFile() {

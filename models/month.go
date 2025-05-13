@@ -145,11 +145,9 @@ func (m MonthModel) genMonthStr(year int, month time.Month) string {
 		}
 		return false
 	}
-	if f(internal.Cfg.ImportantDay.Birthdays) {
-		return fmt.Sprintf("🌟%d-%d", year, month)
-	}
-	if f(internal.Cfg.ImportantDay.MemorialDays) {
+	if f(internal.Cfg.Days) {
 		return fmt.Sprintf("🌟%d-%02d", year, month)
 	}
+
 	return fmt.Sprintf("%d-%02d", year, month)
 }
