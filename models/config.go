@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ltfred/chronos/internal"
 	"strings"
 )
 
@@ -52,7 +53,8 @@ func (m ConfigModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.quit):
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.save):
-			// todo save
+			internal.SaveConfig(m.textarea.Value())
+			m.textarea.Blur()
 		}
 	}
 

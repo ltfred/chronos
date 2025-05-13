@@ -21,6 +21,13 @@ type Day struct {
 	IsLunar bool   `json:"isLunar"`
 }
 
+func SaveConfig(cfg string) {
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(GetConfigPath())
+	cobra.CheckErr(viper.ReadConfig(bytes.NewBuffer([]byte(cfg))))
+	cobra.CheckErr(viper.WriteConfig())
+}
+
 func SetupConfig() {
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(GetConfigPath())
